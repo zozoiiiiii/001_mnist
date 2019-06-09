@@ -200,12 +200,15 @@ double error_network(network net, matrix m, double **truth)
     int i;
     int correct = 0;
     int k = get_network_output_size(net);
-    for(i = 0; i < m.rows; ++i){
+    for(i = 0; i < m.rows; ++i)
+	{
         forward_network(net, m.vals[i]);
         double *out = get_network_output(net);
         int guess = max_index(out, k);
-        if(truth[i][guess]) ++correct;
+        if(truth[i][guess])
+			++correct;
     }
+
     return (double)correct/m.rows;
 }
 
@@ -221,18 +224,27 @@ double **one_hot(double *a, int n, int k)
     return t;
 }
 
+
+
 void test_nist()
 {
     srand(999999);
-    network net = parse_network_cfg("nist.cfg");
-    matrix m = csv_to_matrix("mnist/mnist_train_100.csv");
-    matrix test = csv_to_matrix("mnist/mnist_test_10.csv");
+
+	network net = parse_network_cfg("nist.cfg");
+
+	// train
+    matrix m = csv_to_matrix("mnist/mnist_train.csv");
     double *truth_1d = pop_column(&m, 0);
     double **truth = one_hot(truth_1d, m.rows, 10);
+
+	// test
+	matrix test = csv_to_matrix("mnist/mnist_test_10.csv");
     double *test_truth_1d = pop_column(&test, 0);
     double **test_truth = one_hot(test_truth_1d, test.rows, 10);
     int i,j;
     clock_t start = clock(), end;
+
+	// 0-255 -> 0-1
     for(i = 0; i < test.rows; ++i){
         normalize_array(test.vals[i], 28*28);
         //scale_array(m.vals[i], 28*28, 1./255.);
@@ -245,15 +257,18 @@ void test_nist()
     }
     int count = 0;
     double lr = .0005;
-    while(++count <= 300)
+
+    while(++count <= 10)
 	{
         //lr *= .99;
         int index = 0;
         int correct = 0;
-        int number = 1000;
+        int number = 6000;
+
+		// 训练n次，验证一次
         for(i = 0; i < number; ++i)
 		{
-            index = rand()%m.rows;
+			index = rand() % m.rows;	// choose one data from train set
             forward_network(net, m.vals[index]);
             double *out = get_network_output(net);
             double *delta = get_network_delta(net);
@@ -271,8 +286,10 @@ void test_nist()
             learn_network(net, m.vals[index]);
             update_network(net, lr);
         }
-
+		/*
         print_network(net);
+
+		// input image
         image input = double_to_image(28,28,1, m.vals[index]);
         //show_image(input, "Input");
         image o = get_network_image(net);
@@ -288,19 +305,21 @@ void test_nist()
             double test_acc = error_network(net, test, test_truth);
             fprintf(stderr, "TEST: %f\n\n", test_acc);
             printf("%d, %f, %f\n", count, train_acc, test_acc);
-        }
+        }*/
 
+		fprintf(stderr, "\n%5d: %f %f\n\n", count, (double)correct / number, lr);
         if(count % (m.rows/number) == 0) lr /= 2; 
     }
 
 
             double train_acc = error_network(net, m, truth);
             fprintf(stderr, "\nTRAIN: %f\n", train_acc);
+
             double test_acc = error_network(net, test, test_truth);
             fprintf(stderr, "TEST: %f\n\n", test_acc);
             printf("%d, %f, %f\n", count, train_acc, test_acc);
     end = clock();
-    //printf("Neural Net Learning: %lf seconds\n", (double)(end-start)/CLOCKS_PER_SEC);
+    printf("Neural Net Learning: %lf seconds\n", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
 void test_kernel_update()

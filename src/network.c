@@ -277,9 +277,15 @@ void print_network(network net)
         double mean = mean_array(output, n);
         double vari = variance_array(output, n);
         fprintf(stderr, "Layer %d - Mean: %f, Variance: %f\n",i,mean, vari);
-        if(n > 100) n = 100;
-        for(j = 0; j < n; ++j) fprintf(stderr, "%f, ", output[j]);
-        if(n == 100)fprintf(stderr,".....\n");
+        if(n > 100)
+			n = 100;
+
+        for(j = 0; j < n; ++j)
+			fprintf(stderr, "%f, ", output[j]);
+
+        if(n == 100)
+			fprintf(stderr,".....\n");
+
         fprintf(stderr, "\n");
     }
 }
