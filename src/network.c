@@ -116,7 +116,10 @@ void learn_network(network net, double *input)
     int i;
     double *prev_input;
     double *prev_delta;
-    for(i = net.n-1; i >= 0; --i){
+
+	// backward : visit all layers from last layer to first layer
+    for(i = net.n-1; i >= 0; --i)
+	{
         if(i == 0){
             prev_input = input;
             prev_delta = 0;
@@ -124,6 +127,7 @@ void learn_network(network net, double *input)
             prev_input = get_network_output_layer(net, i-1);
             prev_delta = get_network_delta_layer(net, i-1);
         }
+
         if(net.types[i] == CONVOLUTIONAL){
             convolutional_layer layer = *(convolutional_layer *)net.layers[i];
             learn_convolutional_layer(layer, prev_input);
@@ -226,9 +230,11 @@ image get_network_image_layer(network net, int i)
 image get_network_image(network net)
 {
     int i;
-    for(i = net.n-1; i >= 0; --i){
+    for(i = net.n-1; i >= 0; --i)
+	{
         image m = get_network_image_layer(net, i);
-        if(m.h != 0) return m;
+        if(m.h != 0)
+			return m;
     }
     return make_empty_image(0,0,0);
 }

@@ -48,18 +48,21 @@ convolutional_layer *make_convolutional_layer(int h, int w, int c, int n, int si
     layer->bias_updates = calloc(n, sizeof(double));
     layer->bias_momentum = calloc(n, sizeof(double));
     double scale = 2./(size*size);
-    for(i = 0; i < n; ++i){
+    for(i = 0; i < n; ++i)
+	{
         //layer->biases[i] = rand_normal()*scale + scale;
         layer->biases[i] = 0;
         layer->kernels[i] = make_random_kernel(size, c, scale);
         layer->kernel_updates[i] = make_random_kernel(size, c, 0);
         layer->kernel_momentum[i] = make_random_kernel(size, c, 0);
     }
-    layer->size = 2*(size/2)+1;
-    if(layer->edge){
+    layer->size = 2*(size/2)+1;	// make sure  size is odd number
+    if(layer->edge)
+	{
         out_h = (layer->h-1)/layer->stride + 1;
         out_w = (layer->w-1)/layer->stride + 1;
-    }else{
+    }else
+	{
         out_h = (layer->h - layer->size)/layer->stride+1;
         out_w = (layer->h - layer->size)/layer->stride+1;
     }
@@ -77,9 +80,14 @@ void forward_convolutional_layer(const convolutional_layer layer, double *in)
     image input = double_to_image(layer.h, layer.w, layer.c, in);
     image output = get_convolutional_image(layer);
     int i,j;
-    for(i = 0; i < layer.n; ++i){
+
+	// 1. input * weight + bias
+    for(i = 0; i < layer.n; ++i)
+	{
         convolve(input, layer.kernels[i], layer.stride, i, output, layer.edge);
     }
+
+	// 2. activate * (input*weight+bias)
     for(i = 0; i < output.c; ++i){
         for(j = 0; j < output.h*output.w; ++j){
             int index = i*output.h*output.w + j;
@@ -151,16 +159,16 @@ void update_convolutional_layer(convolutional_layer layer, double step, double m
 {
     //step = .01;
     int i,j;
-    for(i = 0; i < layer.n; ++i){
-        layer.bias_momentum[i] = step*(layer.bias_updates[i]) 
-                                + momentum*layer.bias_momentum[i];
+    for(i = 0; i < layer.n; ++i)
+	{
+        layer.bias_momentum[i] = step*(layer.bias_updates[i]) + momentum*layer.bias_momentum[i];
         layer.biases[i] += layer.bias_momentum[i];
         //layer.biases[i] = constrain(layer.biases[i],1.);
         layer.bias_updates[i] = 0;
         int pixels = layer.kernels[i].h*layer.kernels[i].w*layer.kernels[i].c;
-        for(j = 0; j < pixels; ++j){
-            layer.kernel_momentum[i].data[j] = step*(layer.kernel_updates[i].data[j] - decay*layer.kernels[i].data[j]) 
-                                                + momentum*layer.kernel_momentum[i].data[j];
+        for(j = 0; j < pixels; ++j)
+		{
+            layer.kernel_momentum[i].data[j] = step*(layer.kernel_updates[i].data[j] - decay*layer.kernels[i].data[j]) + momentum*layer.kernel_momentum[i].data[j];
             layer.kernels[i].data[j] += layer.kernel_momentum[i].data[j];
             //layer.kernels[i].data[j] = constrain(layer.kernels[i].data[j], 1.);
         }

@@ -43,9 +43,12 @@ double *pop_column(matrix *m, int c)
 {
     double *col = calloc(m->rows, sizeof(double));
     int i, j;
-    for(i = 0; i < m->rows; ++i){
+
+    for(i = 0; i < m->rows; ++i)
+	{
         col[i] = m->vals[i][c];
-        for(j = c; j < m->cols-1; ++j){
+        for(j = c; j < m->cols-1; ++j)
+		{
             m->vals[i][j] = m->vals[i][j+1];
         }
     }
@@ -66,9 +69,13 @@ matrix csv_to_matrix(char *filename)
 	int n = 0;
 	int size = 1024;
 	m.vals = calloc(size, sizeof(double*));
-	while((line = fgetl(fp))){
-        if(m.cols == -1) m.cols = count_fields(line);
-		if(n == size){
+	while((line = fgetl(fp)))
+	{
+        if(m.cols == -1)
+			m.cols = count_fields(line);
+
+		if(n == size)
+		{
 			size *= 2;
 			m.vals = realloc(m.vals, size*sizeof(double*));
 		}

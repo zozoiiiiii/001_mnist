@@ -8,7 +8,9 @@ typedef struct {
     int h,w,c;
     int n;
     int size;
-    int stride;
+	int stride;
+	ACTIVATION activation;
+
     image *kernels;
     image *kernel_updates;
     image *kernel_momentum;
@@ -19,8 +21,7 @@ typedef struct {
     double *delta;
     double *output;
 
-    ACTIVATION activation;
-    int edge;
+    int edge;	// 1 by default
 } convolutional_layer;
 
 convolutional_layer *make_convolutional_layer(int h, int w, int c, int n, int size, int stride, ACTIVATION activation);

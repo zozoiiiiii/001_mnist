@@ -1,11 +1,21 @@
-# how to run
-	use visual studio 2017 to open the yolo_cpu.sln and run directly.
+# what is it
+	train numbers which writed by hand, then test
+
+# how it works
+
+#### net structure
+![Layers](img/layers.png)
 
 
-# yolo
-download code(2013-12-06): https://github.com/pjreddie/darknet
+#### one hot
+![One Hot](img/one_hot.png)
 
-# mnist dataset 
+# reference
+
+#### yolo
+ download code(2013-12-06): https://github.com/pjreddie/darknet
+
+#### mnist dataset
 1. original data:
 	train images: train-images-idx3-ubyte.gz (60000)
 	train labels: train-labels-idx1-ubyte.gz (60000)
@@ -18,9 +28,7 @@ download code(2013-12-06): https://github.com/pjreddie/darknet
 	
 	format: everyline in the csv file is one object:  label + image
 
-
-
-# reference:
-	https://www.cnblogs.com/bestExpert/p/9291185.html
+#### reference
+    https://www.cnblogs.com/bestExpert/p/9291185.html
 	https://github.com/makeyourownneuralnetwork/makeyourownneuralnetwork
 	

@@ -104,45 +104,30 @@ image copy_image(image p)
     return copy;
 }
 
+void save_image_png(image im, const char *name)
+{
+	char buff[256];
+	sprintf(buff, "%s.png", name);
+	unsigned char *data = (unsigned char*)calloc(im.w*im.h*im.c, sizeof(char));
+	int i, k;
+	for (k = 0; k < im.c; ++k) {
+		for (i = 0; i < im.w*im.h; ++i) {
+			data[i*im.c + k] = (unsigned char)(255 * im.data[i + k * im.w*im.h]);
+		}
+	}
+	int success = stbi_write_png(buff, im.w, im.h, im.c, data, im.w*im.c);
+	free(data);
+	if (!success) fprintf(stderr, "Failed to write ImageData %s\n", buff);
+}
+
 void show_image(image p, char *name)
 {
-	/*
-    int i,j,k;
-    image copy = copy_image(p);
-    normalize_image(copy);
-
-    char buff[256];
-    //sprintf(buff, "%s (%d)", name, windows);
-    sprintf(buff, "%s", name);
-
-    IplImage *disp = cvCreateImage(cvSize(p.w,p.h), IPL_DEPTH_8U, p.c);
-    int step = disp->widthStep;
-    cvNamedWindow(buff, CV_WINDOW_AUTOSIZE); 
-    //cvMoveWindow(buff, 100*(windows%10) + 200*(windows/10), 100*(windows%10));
-    ++windows;
-    for(i = 0; i < p.h; ++i){
-        for(j = 0; j < p.w; ++j){
-            for(k= 0; k < p.c; ++k){
-                disp->imageData[i*step + j*p.c + k] = (unsigned char)(get_pixel(copy,i,j,k)*255);
-            }
-        }
-    }
-    free_image(copy);
-    if(disp->height < 500 || disp->width < 500){
-        int w = 1500;
-        int h = w*p.h/p.w;
-        if(h > 1000){
-            h = 1000;
-            w = h*p.w/p.h;
-        }
-        IplImage *buffer = disp;
-        disp = cvCreateImage(cvSize(w, h), buffer->depth, buffer->nChannels);
-        cvResize(buffer, disp, CV_INTER_NN);
-        cvReleaseImage(&buffer);
-    }
-    cvShowImage(buff, disp);
-    cvReleaseImage(&disp);
-	*/
+#ifdef OPENCV
+	show_image_cv(p, name);
+#else
+	fprintf(stderr, "Not compiled with OpenCV, saving to %s.png instead\n", name);
+	save_image_png(p, name);
+#endif
 }
 
 void show_image_layers(image p, char *name)
@@ -363,7 +348,8 @@ void two_d_convolve(image m, int mc, image kernel, int kc, int stride, image out
         xend = m.h-kernel.h/2;
         yend = m.w - kernel.w/2;
     }
-    for(x = xstart; x < xend; x += stride){
+
+    for(x = xstart; x < xend; x += stride)	{
         for(y = ystart; y < yend; y += stride){
             double sum = 0;
             for(i = 0; i < kernel.h; ++i){
@@ -395,7 +381,8 @@ void convolve(image m, image kernel, int stride, int channel, image out, int edg
     assert(m.c == kernel.c);
     int i;
     zero_channel(out, channel);
-    for(i = 0; i < m.c; ++i){
+    for(i = 0; i < m.c; ++i)
+	{
         two_d_convolve(m, i, kernel, i, stride, out, channel, edge);
     }
     /*
