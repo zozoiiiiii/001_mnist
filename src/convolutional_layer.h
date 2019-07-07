@@ -6,10 +6,10 @@
 
 typedef struct {
     int h,w,c;
-    int n;
-    int size;
-	int stride;
-	ACTIVATION activation;
+    int n;			// filters
+    int size;		// size
+	int stride;		// stride
+	ACTIVATION activation;	// activation
 
     image *kernels;
     image *kernel_updates;

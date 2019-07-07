@@ -74,7 +74,7 @@ void test_nist()
     }
 
 
-	// training
+	// training， 1. 使用训练数据
     int count = 0;
     double lr = .0005;
     while(++count <= 300)
@@ -87,10 +87,8 @@ void test_nist()
 		{
 			index = rand() % m.rows;
 
-			// forward
+			// 2. 得到预测值,  output = active * (input * weight + bias)
             forward_network(net, m.vals[index]);
-
-			// get the output and delta from last layer
             double *out = get_network_output(net);
             double *delta = get_network_delta(net);
 
@@ -98,7 +96,7 @@ void test_nist()
             double max = out[0];
             for(j = 0; j < 10; ++j)
 			{
-				// get delta
+				// get delta， 3， 得到差值
                 delta[j] = truth[index][j]-out[j];
 
 				// find the max
@@ -113,8 +111,10 @@ void test_nist()
             if(truth[index][max_i])
 				++correct;
 
-			// learn
+			// learn, loss function， 3， 计算loss， 保存结果到bias_updates
             learn_network(net, m.vals[index]);
+
+			// 4, 获得最终biases和kernel(weight)
             update_network(net, lr);
         }
 

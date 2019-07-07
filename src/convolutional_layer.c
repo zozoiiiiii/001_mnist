@@ -133,11 +133,14 @@ void backward_convolutional_layer2(convolutional_layer layer, double *input, dou
 }
 
 void gradient_delta_convolutional_layer(convolutional_layer layer)
-{
+ {
     int i;
     image out_delta = get_convolutional_delta(layer);
     image out_image = get_convolutional_image(layer);
-    for(i = 0; i < out_image.h*out_image.w*out_image.c; ++i){
+
+	// 遍历所有像素， 更新参数delta
+    for(i = 0; i < out_image.h*out_image.w*out_image.c; ++i)
+	{
         out_delta.data[i] *= gradient(out_image.data[i], layer.activation);
     }
 }
@@ -148,7 +151,10 @@ void learn_convolutional_layer(convolutional_layer layer, double *input)
     image in_image = double_to_image(layer.h, layer.w, layer.c, input);
     image out_delta = get_convolutional_delta(layer);
     gradient_delta_convolutional_layer(layer);
-    for(i = 0; i < layer.n; ++i){
+
+	// 遍历所有filter, 更新到bias_updates
+    for(i = 0; i < layer.n; ++i)
+	{
         kernel_update(in_image, layer.kernel_updates[i], layer.stride, i, out_delta, layer.edge);
         layer.bias_updates[i] += avg_image_layer(out_delta, i);
         //printf("%30.20lf\n", layer.bias_updates[i]);

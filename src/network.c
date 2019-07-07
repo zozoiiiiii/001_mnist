@@ -130,6 +130,8 @@ void learn_network(network net, double *input)
 
         if(net.types[i] == CONVOLUTIONAL){
             convolutional_layer layer = *(convolutional_layer *)net.layers[i];
+
+			// 使用 梯度下降法 来保证loss越来越小， loss=
             learn_convolutional_layer(layer, prev_input);
             if(i != 0) backward_convolutional_layer(layer, prev_input, prev_delta);
         }
